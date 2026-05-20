@@ -21,7 +21,7 @@ def apply_adjustment(df, adj_table_path, timeframe):
     adj_pd = pd.read_csv(adj_table_path)
     adj_pl = pl.from_pandas(adj_pd[['date', 'cum_delta']])
     
-    # --- 🟢 關鍵修正：將校正邊界精確設定在結算抽離時刻 13:45:00 (5分鐘緩衝) ---
+    # --- 關鍵修正：將校正邊界精確設定在結算抽離時刻 13:45:00 (5分鐘緩衝) ---
     adj_pl = adj_pl.with_columns([
         pl.col("date").str.to_date(format="%Y/%m/%d").alias("adj_date"),
         # 結算日 13:50 之後的資料就不該再吃這一筆修正值

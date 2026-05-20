@@ -1,7 +1,7 @@
-# macOS 自動執行 Shioaji TXF/TSE Collector SOP
+# macOS 自動執行 Shioaji TXF/MXF/TSE Collector SOP
 
 **服務名稱（唯一識別）**
-`com.garrett.shioaji.txf_tse_collector`
+`com.garrett.shioaji.txf_mxf_tse_collector`
 
 **專案路徑**
 
@@ -36,7 +36,7 @@ mkdir -p ~/Library/LaunchAgents
 ## STEP 2｜建立 LaunchAgent plist
 
 ```bash
-nano ~/Library/LaunchAgents/com.garrett.shioaji.txf_tse_collector.plist
+nano ~/Library/LaunchAgents/com.garrett.shioaji.txf_mxf_tse_collector.plist
 ```
 
 ---
@@ -49,7 +49,7 @@ nano ~/Library/LaunchAgents/com.garrett.shioaji.txf_tse_collector.plist
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>com.garrett.shioaji.txf_tse_collector</string>
+    <string>com.garrett.shioaji.txf_mxf_tse_collector</string>
 
     <key>ProgramArguments</key>
     <array>
@@ -102,9 +102,9 @@ nano ~/Library/LaunchAgents/com.garrett.shioaji.txf_tse_collector.plist
     <true/>
 
     <key>StandardOutPath</key>
-    <string>/tmp/txf_tse_collector.out.log</string>
+    <string>/tmp/txf_mxf_tse_collector.out.log</string>
     <key>StandardErrorPath</key>
-    <string>/tmp/txf_tse_collector.err.log</string>
+    <string>/tmp/txf_mxf_tse_collector.err.log</string>
 </dict>
 </plist>
 ```
@@ -123,7 +123,7 @@ Ctrl + X
 ## STEP 5｜載入 LaunchAgent
 
 ```bash
-launchctl load ~/Library/LaunchAgents/com.garrett.shioaji.txf_tse_collector.plist
+launchctl load ~/Library/LaunchAgents/com.garrett.shioaji.txf_mxf_tse_collector.plist
 ```
 
 ✅ 沒輸出 = 成功
@@ -133,14 +133,14 @@ launchctl load ~/Library/LaunchAgents/com.garrett.shioaji.txf_tse_collector.plis
 ## STEP 6｜手動測試（一定要做）
 
 ```bash
-launchctl start com.garrett.shioaji.txf_tse_collector
+launchctl start com.garrett.shioaji.txf_mxf_tse_collector
 ```
 
 查看 log：
 
 ```bash
-tail -f /tmp/shioaji_txf_tse_collector.out.log
-tail -f /tmp/shioaji_txf_tse_collector.err.log
+tail -f /tmp/shioaji_txf_mxf_tse_collector.out.log
+tail -f /tmp/shioaji_txf_mxf_tse_collector.err.log
 ```
 
 > 判斷結果：
@@ -159,7 +159,7 @@ launchctl list | grep shioaji
 應看到：
 
 ```text
-com.garrett.shioaji.txf_tse_collector
+com.garrett.shioaji.txf_mxf_tse_collector
 ```
 
 ---
@@ -172,7 +172,7 @@ com.garrett.shioaji.txf_tse_collector
 > 只有在 `launchctl list | grep shioaji` **看得到** 時才需要執行
 
 ```bash
-launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.garrett.shioaji.txf_tse_collector.plist
+launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.garrett.shioaji.txf_mxf_tse_collector.plist
 ```
 
 ✔ 沒有任何輸出 = 成功
@@ -184,10 +184,10 @@ launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.garrett.shioaji.txf_ts
 
 ```bash
 # 1. 先卸載（若已存在）
-launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.garrett.shioaji.txf_tse_collector.plist
+launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.garrett.shioaji.txf_mxf_tse_collector.plist
 
 # 2. 重新載入
-launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.garrett.shioaji.txf_tse_collector.plist
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.garrett.shioaji.txf_mxf_tse_collector.plist
 ```
 
 ✔ 沒輸出 = 成功
@@ -198,7 +198,7 @@ launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.garrett.shioaji.txf_
 ### ▶️ 手動立即執行（不等時間）
 
 ```bash
-launchctl start com.garrett.shioaji.txf_tse_collector
+launchctl start com.garrett.shioaji.txf_mxf_tse_collector
 ```
 
 常用於：
@@ -219,7 +219,7 @@ launchctl list | grep shioaji
 
 | 顯示結果                                      | 意義       |
 | ----------------------------------------- | -------- |
-| 有 `com.garrett.shioaji.txf_tse_collector` | 已載入、待命   |
+| 有 `com.garrett.shioaji.txf_mxf_tse_collector` | 已載入、待命   |
 | 沒有任何輸出                                    | 尚未載入或已停用 |
 
 ---

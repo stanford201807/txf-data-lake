@@ -68,7 +68,7 @@ class DataProcessor:
         else:
             df = df.with_columns(pl.col("date_temp").alias("date"))
 
-        # Step B: 🟢 [關鍵修正] 建立 VWAP 專用分組日期 (解決跨午夜斷裂)
+        # Step B: [關鍵修正] 建立 VWAP 專用分組日期 (解決跨午夜斷裂)
         # 邏輯: 若是夜盤且時間 < 08:00 (代表過了午夜)，歸類到「前一天」的夜盤群組
         df = df.with_columns(
             pl.when((pl.col("session") == "Night") & (pl.col("ts").dt.hour() < 8))

@@ -22,7 +22,7 @@ class ChartBuilder:
         # K棒
         df_kbars = df.select(['time', 'open', 'high', 'low', 'close', 'color', 'borderColor', 'wickColor']).to_pandas()
         
-        # 🟢 [修正] 成交量欄位必須叫 'volume' (對應 create_histogram 的名稱)
+        # [修正] 成交量欄位必須叫 'volume' (對應 create_histogram 的名稱)
         # 之前 alias('value') 是錯誤的，因為圖層名稱我們取為 'volume'
         df_volume = df.select(['time', pl.col('volume').alias('volume'), pl.col('vol_color').alias('color')]).to_pandas()
 
@@ -50,7 +50,7 @@ class ChartBuilder:
 
         for col_name, label, color, width in indicators:
             if col_name in df.columns:
-                # 🟢 [修正] 指標也一樣，線叫什麼名字 (label)，欄位就要叫什麼名字
+                # [修正] 指標也一樣，線叫什麼名字 (label)，欄位就要叫什麼名字
                 line_data = df.select(['time', pl.col(col_name).alias(label)]).drop_nulls().to_pandas()
                 
                 if not line_data.empty:

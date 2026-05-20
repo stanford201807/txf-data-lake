@@ -1,6 +1,6 @@
 # 🇹🇼 TXF Data Lake (Taiwan Index Futures)
 
-這是一個針對 **台指期 (TXF)** 與 **加權指數 (TSE)** 的資料處理專案。
+這是一個針對 **台指期 (TXF)**、**小台指期 (MXF)** 與 **加權指數 (TSE)** 的資料處理專案。
 利用 Python 與 Shioaji API 進行 Tick 資料抓取，並透過 Polars 進行高速清洗與重取樣，最終輸出 Parquet 檔案。
 
 內建互動看盤工具，使用 `lightweight-charts` 顯示日線圖，並支援圖例切換均線顯示。
@@ -13,7 +13,7 @@
       * 原始 Tick 資料以月為單位儲存。
       * K-bar 資料支援 `5s`, `1m`, `5m`, `1h`, `1d`。
   * **ETL 流程**：
-      * 同時支援 `TXF` 與 `TSE` 兩種商品。
+      * 同時支援 `TXF`、`MXF` 與 `TSE` 三種商品。
       * 日線資料存成年度 Parquet，分時資料存成每日 Parquet。
       * 增量更新機制，已有 Tick 檔案不重複下載。
   * **互動看盤**：
@@ -69,6 +69,7 @@ txf-data-lake/
 ├── batch_run.py
 ├── fix_kbars.py
 ├── main_etl.py
+├── mxf_batch_run.py
 ├── README.md
 ├── requirements.txt
 └── view_chart.py
@@ -82,7 +83,7 @@ txf-data-lake/
 
 ### 1\. 每日更新 (Daily ETL)
 
-每天收盤（下午 13:45 以後）執行，抓取當日資料。
+每天收盤（下午 13:45 以後）執行，抓取 `TXF`、`MXF` 與 `TSE` 的當日資料。
 
 ```bash
 # 預設抓取「今天」的資料
@@ -99,6 +100,12 @@ python main_etl.py --date 2025-12-05
 
 ```bash
 python batch_run.py
+```
+
+若要補 `MXF` 歷史回測資料，請直接執行 `mxf_batch_run.py`。這個入口會只下載 `MXF`，避免和 `TXF/TSE` 的日常批次混在一起。
+
+```bash
+python mxf_batch_run.py
 ```
 
 ### 3\. 專業看盤 (View Chart)
@@ -170,9 +177,10 @@ class ColorScheme:
 
 ## ⚠️ 注意事項 (Notes)
 
-1.  **Shioaji Quota**: 若遇到 `UsageStatus` 額度不足，請等待隔日重置。通常一個月 TXF Tick 資料量約 50MB\~120MB 不等。
+1.  **Shioaji Quota**: 若遇到 `UsageStatus` 額度不足，請等待隔日重置。通常一個月 TXF Tick 資料量約 50MB\~120MB，不同商品的實際流量會有差異。
 2.  **Mac 顯示問題**: 若圖表全黑或無顯示，請確認 `view_chart.py` 中是否已強制啟用圖例 (Legend) 與十字線 (Crosshair) 的可見度設定。
 3.  **補班日**: `batch_run.py` 採用 `freq='D'` 掃描，確保不會漏掉週六補班日的交易資料。
+4.  **MXF 回測**: `mxf_batch_run.py` 是獨立入口，適合補 `MXF` 歷史資料或做回測資料下載，不影響 `TXF/TSE` 的既有流程。
 
 -----
 

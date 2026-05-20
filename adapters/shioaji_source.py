@@ -12,16 +12,17 @@ class ShioajiSource:
     def connect(self):
         if not self.is_connected:
             accounts = self.api.login(API_KEY, SECRET_KEY) # pyright: ignore[reportArgumentType]
-            print(f"✅ Shioaji Login: {accounts[0].person_id}")
+            print(f"[Login] Shioaji Login: {accounts[0].person_id}")
             self.is_connected = True
 
     def get_contract(self, symbol_code):
         """
         工廠方法：根據代碼回傳對應的 Contract 物件
         """
-        if symbol_code == 'TXF':
+        if symbol_code in {'TXF', 'MXF'}:
             # 抓期貨近月
-            return self.api.Contracts.Futures.TXF.TXFR1
+            futures_contract = getattr(self.api.Contracts.Futures, symbol_code)
+            return getattr(futures_contract, f"{symbol_code}R1")
         elif symbol_code == 'TSE':
             # 抓加權指數
             return self.api.Contracts.Indexs.TSE.TSE001
@@ -34,12 +35,12 @@ class ShioajiSource:
         # 1. 取得合約 (這裡示範抓 TXF 近月)
         contract = self.get_contract(symbol_code)
         
-        print(f"📥 Fetching {symbol_code} ticks for {date_str}...")
+        print(f"[Fetch] Fetching {symbol_code} ticks for {date_str}...")
         ticks = self.api.ticks(contract, date_str)
 
-        # 🛡️ 防呆：如果沒抓到資料，直接回傳空的 DataFrame
+        # 防呆：如果沒抓到資料，直接回傳空的 DataFrame
         if not ticks or len(ticks.ts) == 0:
-            print(f"⚠️ Warning: No ticks found for {symbol_code} on {date_str}")
+            print(f"[Warning] No ticks found for {symbol_code} on {date_str}")
             return pl.DataFrame() # 回傳空表，讓 main_etl.py 處理
 
 
@@ -50,7 +51,7 @@ class ShioajiSource:
             'close': ticks.close,
             'volume': ticks.volume
         }
-        if symbol_code == 'TXF':
+        if symbol_code in {'TXF', 'MXF'}:
             data_dict.update({
                 'bid_price': ticks.bid_price,
                 'bid_volume': ticks.bid_volume,
@@ -71,7 +72,7 @@ class ShioajiSource:
         if 'tick_type' in df.columns:
             df = df.with_columns(pl.col("tick_type").cast(pl.Int8))
 
-        # 🌟 5. 注入 Symbol 標籤 (為了未來的合併做準備)
+        # 5. 注入 Symbol 標籤 (為了未來的合併做準備)
         # 使用 pl.lit (Literal) 填充整列，Polars 會優化儲存，不佔空間
         df = df.with_columns(pl.lit(symbol_code).alias("symbol"))
         # 欄位排序：確保 ts → symbol 在最前面，其他欄位保持原順序
